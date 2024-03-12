@@ -10,9 +10,12 @@ from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 
 from dotenv import load_dotenv
-load_dotenv()  # take environment variables from .env (especially openai api key)
 
-st.title("RockyBot: News Research Tool 📈")
+# Load environment variables from .env file
+load_dotenv()
+
+print()
+st.title("NewsY: News Research Tool 📈")
 st.sidebar.title("News Article URLs")
 
 urls = []
@@ -24,7 +27,7 @@ process_url_clicked = st.sidebar.button("Process URLs")
 file_path = "faiss_store_openai.pkl"
 
 main_placeholder = st.empty()
-llm = OpenAI(temperature=0.9, max_tokens=500)
+llm = OpenAI(temperature=0.9, max_tokens=500, api_key=os.getenv("OPENAI_API_KEY"))
 
 if process_url_clicked:
     # load data
@@ -40,13 +43,25 @@ if process_url_clicked:
     docs = text_splitter.split_documents(data)
     # create embeddings and save it to FAISS index
     embeddings = OpenAIEmbeddings()
-    vectorstore_openai = FAISS.from_documents(docs, embeddings)
-    main_placeholder.text("Embedding Vector Started Building...✅✅✅")
-    time.sleep(2)
 
-    # Save the FAISS index to a pickle file
-    with open(file_path, "wb") as f:
-        pickle.dump(vectorstore_openai, f)
+    # Assuming embeddings has an attribute named 'embeddings_list'
+    embeddings_list = getattr(embeddings, 'embeddings_list', None)
+
+    # Check the structure of the embeddings
+    if embeddings_list and isinstance(embeddings_list, list) and len(embeddings_list) > 0:
+        print("Number of embeddings:", len(embeddings_list))
+        print("Length of the first element in embeddings:", len(embeddings_list[0]))
+        
+        vectorstore_openai = FAISS.from_documents(docs, embeddings_list)
+
+        main_placeholder.text("Embedding Vector Started Building...✅✅✅")
+        time.sleep(2)
+
+        # Save the FAISS index to a pickle file
+        with open(file_path, "wb") as f:
+            pickle.dump(vectorstore_openai, f)
+    else:
+        print("Error: Invalid or missing embeddings list.")
 
 query = main_placeholder.text_input("Question: ")
 if query:
@@ -66,7 +81,3 @@ if query:
                 sources_list = sources.split("\n")  # Split the sources by newline
                 for source in sources_list:
                     st.write(source)
-
-
-
-
