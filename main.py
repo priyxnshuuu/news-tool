@@ -12,10 +12,9 @@ from langchain.vectorstores import FAISS
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
-load_dotenv()
+load_dotenv()  # take environment variables from .env (especially openai api key)
 
-print()
-st.title("NewsY: News Research Tool 📈")
+st.title("Newsy Bot: News Research Tool 📈")
 st.sidebar.title("News Article URLs")
 
 urls = []
@@ -27,7 +26,8 @@ process_url_clicked = st.sidebar.button("Process URLs")
 file_path = "faiss_store_openai.pkl"
 
 main_placeholder = st.empty()
-llm = OpenAI(temperature=0.9, max_tokens=500, api_key=os.getenv("OPENAI_API_KEY"))
+#loading LLM model
+llm = OpenAI(temperature=0.9, max_tokens=500)
 
 if process_url_clicked:
     # load data
