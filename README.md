@@ -30,7 +30,7 @@ NewsyBot is a user-friendly news research tool designed for effortless informati
 ```bash
   OPENAI_API_KEY=your_api_key_here
 ```
-4. Run docker desktop into your system and then past this command in your terminal:
+4.Run docker desktop into your system and then past this command in your terminal:
 
 ```bash
   docker-compose up --build 
